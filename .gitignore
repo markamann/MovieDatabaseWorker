@@ -328,3 +328,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Connections files
+# These files may contain private connection strings
+*connection*
+*Connection*
