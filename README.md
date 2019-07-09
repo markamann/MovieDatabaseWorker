@@ -11,5 +11,4 @@ In this way, the application is self-populating.  I have included various functi
 
 ## Use
 
-Please note, the code published in the above mentioned public repositories on my GitHub account is intended for code sample purposes only.  You may download the solutions for review purposes. However, the solutions will not compile or run due to the absence of several dependencies.  Key among those dependencies is a library containing connection information.  This library contains private information such as database connection strings, usernames and passwords, private API tokens, and other sensitive information.  For security reasons, I cannot make this library or its code available to the public.
-
+Please note, the code published in this public repository is intended for code sample purposes only.  You may download the solutions for review purposes. However, the solutions will not compile or run due to the absence of several dependencies.  Key among those dependencies is a library containing connection information.  This library contains private information such as database connection strings, usernames and passwords, private API tokens, and other sensitive information.  For security reasons, I cannot make this library or its code available to the public.
