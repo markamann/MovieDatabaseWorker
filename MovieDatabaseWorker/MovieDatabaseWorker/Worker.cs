@@ -1518,6 +1518,9 @@ namespace MovieDatabaseWorker
                 Console.WriteLine(DateTime.Now.ToString() + " - Series Simple TV episodes EpisodeMovieID updated.");
             }
 
+            // Update Filmographies
+            Stage06_UpdateFilmographies(Program.tempmovie.IMDBID, MovieID);
+
             Console.WriteLine(DateTime.Now.ToString() + " - Stage 6 complete.");
 
             Program.tempmoviestatus.Stage = 7;
@@ -2193,6 +2196,36 @@ namespace MovieDatabaseWorker
                     } while (!successful);
                 }
             }
+        }
+
+        /// <summary>
+        /// Uploads the Filmographies table by updating the MovieID of any record with the given IMDBID
+        /// </summary>
+        /// <param name="imdbid">The IMDBID of the records to be updated.</param>
+        /// <param name="movieid">The MovieID of the recently added movie.</param>
+        public static void Stage06_UpdateFilmographies(String imdbid, long movieid)
+        {
+            SqlConnection _Cn = new SqlConnection(Connections.ConnectionStrings.MovieDatabaseConnectionString_Private);
+            SqlCommand _Cmd = null;
+            String sSql = String.Empty;
+
+            bool successful = false;
+            do
+            {
+                try
+                {
+                    sSql = "UPDATE Filmographies SET F.MovieID = " + movieid.ToString() + " WHERE IMDBID = '" + imdbid + "'";
+                    _Cn.Open();
+                    _Cmd = new SqlCommand(sSql, _Cn);
+                    _Cmd.ExecuteNonQuery();
+                    _Cn.Close();
+                    successful = true;
+                }
+                catch (Exception ex)
+                {
+                    successful = false;
+                }
+            } while (!successful);
         }
 
         #endregion
