@@ -1519,7 +1519,7 @@ namespace MovieDatabaseWorker
             }
 
             // Update Filmographies
-            Stage06_UpdateFilmographies(Program.tempmovie.IMDBID, MovieID);
+             Stage06_UpdateFilmographies(Program.tempmovie.IMDBID, MovieID);
 
             Console.WriteLine(DateTime.Now.ToString() + " - Stage 6 complete.");
 
@@ -2214,7 +2214,7 @@ namespace MovieDatabaseWorker
             {
                 try
                 {
-                    sSql = "UPDATE Filmographies SET F.MovieID = " + movieid.ToString() + " WHERE IMDBID = '" + imdbid + "'";
+                    sSql = "UPDATE Filmographies SET MovieID = " + movieid.ToString() + " WHERE IMDBID = '" + imdbid + "'";
                     _Cn.Open();
                     _Cmd = new SqlCommand(sSql, _Cn);
                     _Cmd.ExecuteNonQuery();
