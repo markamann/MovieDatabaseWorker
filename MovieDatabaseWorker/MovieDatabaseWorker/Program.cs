@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MovieDatabaseWorker
 {
@@ -10,6 +11,23 @@ namespace MovieDatabaseWorker
     {
         static void Main(string[] args)
         {
+#if DEBUG
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.ColoredConsole()
+                .WriteTo.File("Logs\\Log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+#else
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information();
+                .WriteTo.ColoredConsole()
+                .WriteTo.File("Logs\\Log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+#endif
+
+            Log.Information("Program started");
+            _eh.ResetConsecutvieErrorCount();
+
             Worker worker = new Worker();
             bool successful = false;
 
@@ -21,11 +39,16 @@ namespace MovieDatabaseWorker
                 {
                     Program.tempmoviestatus = Program.BLL_TempMovieStatus.SelectByID_model(1);
                     successful = (Program.tempmoviestatus != null);
+                    _eh.ResetConsecutvieErrorCount();
+                    Log.Information("TempMovieStatus record loaded.");
                 }
                 catch (Exception ex)
                 {
                     Program.tempmoviestatus = null;
                     successful = false;
+                    _eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("TempMovieStatus record load failed.", ex);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", _eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
 
@@ -40,11 +63,16 @@ namespace MovieDatabaseWorker
             }
             else
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - Error: Unable to load TempMovieStatus object.");
+                _eh.IncreaseConsecutvieErrorCount();
+                Log.Error("Unable to load TempMovieStatus object.");
+                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", _eh.ConsecutiveErrorCount);
+                Log.Fatal("Unable to load TempMovieStatus object. Cannot proceed.");
             }
         }
 
         // Global variables
+        public static MDBW_ErrorHandler _eh = new MDBW_ErrorHandler();
+
         public static DA.Models.MovieDatabase.TempMovieStatus tempmoviestatus = null;
         public static DA.Models.MovieDatabase.TempMovie tempmovie = null;
         public static DA.Models.MovieDatabase.TempPerson tempperson = null;

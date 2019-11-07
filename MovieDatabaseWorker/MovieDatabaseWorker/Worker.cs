@@ -10,11 +10,40 @@ using System.Net;
 using System.Drawing;
 using System.Threading;
 using System.Data.SqlClient;
+using Serilog;
 
 namespace MovieDatabaseWorker
 {
     public class Worker
     {
+
+        // Logging example
+        // Log.Debug("Processing item {ItemNumber} of {ItemCount}", itemNumber, itemCount);
+        /*
+            Log Levels        
+            
+            // Anything and everything you might want to know about
+            // a running block of code.
+            Verbose,
+
+            // Internal system events that aren't necessarily
+            // observable from the outside.
+            Debug,
+
+            // "Things happen."
+            Information,
+
+            // Service is degraded or endangered.
+            Warning,
+
+            // Functionality is unavailable, invariants are broken
+            // or data is lost.
+            Error,
+
+            // If you have a pager, it goes off when one of these
+            // occurs.
+            Fatal
+        */
 
         #region Primary Control
 
@@ -23,6 +52,8 @@ namespace MovieDatabaseWorker
         /// </summary>
         public void DoWork()
         {
+            //Log.Warning("Warning!  Something bad is about to happen!");
+            //Log.Error("Error!  Something bad happened!");
             ExecuteStages();
         }
 
@@ -74,7 +105,7 @@ namespace MovieDatabaseWorker
         public static void Stage00_GetNextTempMovie()
         {
             Console.Title = "Stage 0";
-            Console.WriteLine(DateTime.Now.ToString() + " - Getting next temp movie.");
+            Log.Information("Stage 0 - Loading next temp movie.");
             Program.tempmovie = null;
             bool QuerySuccess = false;
 
@@ -89,12 +120,18 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     QuerySuccess = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("There was an error truncating the temp tables. Attempting to retry.", ex);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!QuerySuccess);
-            Console.WriteLine(DateTime.Now.ToString() + " - All temp tables truncated.");
+            Log.Information("All temp tables truncated.");
+            Program._eh.ResetConsecutvieErrorCount();
 
             DataTable dt = null;
 
+
+            Log.Information("Determining if there are any records in the TVEpisodeQueue table.");
             QuerySuccess = false;
             do
             {
@@ -103,18 +140,22 @@ namespace MovieDatabaseWorker
                     dt = Program.BLL_TVEpisodeQueue.SelectNext_datatable();
                     QuerySuccess = (dt != null);
                 }
-                catch
+                catch (Exception ex)
                 {
                     QuerySuccess = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("There was an error retrieving the TempEpisodeQueue datatable. Attempting to retry.", ex);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!QuerySuccess);
+            Log.Debug("TVEpisodeQueue.SelectNext datatable retrieved.", dt);
+            Program._eh.ResetConsecutvieErrorCount();
 
             if (dt.Rows.Count > 0)
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - TVEpisodeQueue selected.  Loading next movie.");
-
                 // There is a record in the TVEpisodeQueue.  Make that
                 // record the next TempMovie.
+                Log.Information("TVEpisodeQueue selected.  Loading next movie.");
                 Program.tvepisodequeue = null;
                 do
                 {
@@ -122,11 +163,16 @@ namespace MovieDatabaseWorker
                     {
                         Program.tvepisodequeue = Program.BLL_TVEpisodeQueue.SelectNext_model();
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         Program.tvepisodequeue = null;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("There was an error loading the TempEpisodeQueue object. Attempting to retry.", ex);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (Program.tvepisodequeue == null);
+                Log.Debug("TVEpisodeQueue object loaded.", Program.tvepisodequeue);
+                Program._eh.ResetConsecutvieErrorCount();
 
                 Program.TempMovieSource = "TVEpisodeQueue";
 
@@ -135,24 +181,32 @@ namespace MovieDatabaseWorker
                 {
                     if (!Program.tvepisodequeue.MovieJSON.Equals(""))
                     {
+                        Log.Debug("MovieJSON is populated.  Attempting to build a TempMovie object from the JSON.");
                         Program.tempmovie = API_IMDB.IMDB.GetMovieByMovieJSON(Program.tvepisodequeue.MovieJSON);
                     }
                     else
                     {
+                        Log.Debug("MovieJSON is not populated.  Retrieving data from the API.");
                         API_IMDB.Classes.TempMovieResponse tempmovieresponse = API_IMDB.IMDB.GetMovieByIMDBID(Program.tvepisodequeue.EpisodeIMDBID, Connections.ConnectionStrings.myApiFilmsToken);
                         if (tempmovieresponse.Success)
                         {
+                            Log.Debug("API lookup successful.");
                             Program.tempmovie = tempmovieresponse.oTempMovie;
                         }
                         else
                         {
+                            Log.Debug("API lookup failure.");
+                            Log.Error("There was an error loading temp movie.", tempmovieresponse);
                             Program.tempmovie = null;
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
                     Program.tempmovie = null;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("There was an error loading temp movie.", ex);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
 
                 if (Program.tempmovie != null)
@@ -160,11 +214,12 @@ namespace MovieDatabaseWorker
                     Program.tempmoviestatus.Stage = 1;
                     Program.tempmoviestatus.MovieSource = Program.TempMovieSource;
                     UpdateTempMovieStatus(Program.tempmoviestatus);
+                    Log.Information("Stage 0 complete.  Proceeding to Stage 1.");
                 }
             }
             else
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - MovieQueue selected.  Loading next movie.");
+                Log.Information("MovieQueue selected.  Loading next movie.");
 
                 // There is NOT a record in the TVEpisodeQueue.  Make
                 // the next record in the MovieQueue the next TempMovie.
@@ -176,11 +231,16 @@ namespace MovieDatabaseWorker
                     {
                         Program.moviequeue = Program.BLL_MovieQueue.SelectNext_model();
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         Program.moviequeue = null;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("There was an error loading the moviequeue object.", ex);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (Program.moviequeue == null);
+                Log.Debug("moviequeue object loaded.", Program.moviequeue);
+                Program._eh.ResetConsecutvieErrorCount();
 
                 Program.TempMovieSource = "MovieQueue";
 
@@ -190,6 +250,7 @@ namespace MovieDatabaseWorker
                 // and save it to the database.
                 if ((Program.moviequeue.MovieJSON == null) || (Program.moviequeue.MovieJSON.Equals("")))
                 {
+                    Log.Debug("MovieJSON is populated.  Attempting to build a TempMovie object from the JSON.");
                     API_IMDB.Classes.TempMovieJSONResponse resp;
                     QuerySuccess = false;
                     do
@@ -203,9 +264,14 @@ namespace MovieDatabaseWorker
                         {
                             QuerySuccess = false;
                             resp = null;
+                            Log.Error("There was an error loading the data from the API.", ex, resp);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
+                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                         Thread.Sleep(30000);
                     } while (!QuerySuccess);
+                    Log.Debug("MovieJSON has been successully retrieved via the API.", resp);
+                    Program._eh.ResetConsecutvieErrorCount();
 
                     Program.moviequeue.MovieJSON = resp.MovieJSON;
 
@@ -216,23 +282,30 @@ namespace MovieDatabaseWorker
                         Program.moviequeue = Program.BLL_MovieQueue.SelectByQueueID_model(Program.moviequeue.QueueID);
                         QuerySuccess = Program.moviequeue.MovieJSON.Equals(resp.MovieJSON);
                     } while (!QuerySuccess);
+                    Log.Debug("MovieQueue object successfully updated in the database with new MovieJSON.", Program.moviequeue);
+                    Program._eh.ResetConsecutvieErrorCount();
                 }
+                Log.Debug("The MovieJSON in the moviequeue has been successfully updated.", Program.moviequeue);
 
                 // MovieJSON will be set at this point.
                 // Get the Type from the MovieJSON
                 String movietype = String.Empty;
                 movietype = API_IMDB.IMDB.GetTypeFromJSON(Program.moviequeue.MovieJSON);
+                Log.Debug("Movie Type retrieved from MovieJSON.", movietype);
 
                 bool proceed = VerifySupportedType(movietype);
 
                 if (!proceed)
                 {
+                    Log.Debug("Movie failed supported type verification.");
                     AddToMovieQueueErrors(Program.moviequeue, movietype, "Unsupported type");
                     DeleteFromMovieQueue(Program.moviequeue.IMDBID);
 
                     Program.tempmoviestatus.Stage = 0;
                     Program.tempmoviestatus.MovieSource = "";
                     UpdateTempMovieStatus(Program.tempmoviestatus);
+                    Log.Information("Temp Movie loaded.");
+                    Log.Information("Stage 0 complete.  Proceeding to Stage 1.");
                 }
                 else
                 {
@@ -245,17 +318,21 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             Program.tempmovie = null;
+                            Log.Error("There was an error getting Movie by MovieJSON from the API.", ex);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
+                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (Program.tempmovie == null);
+                    Log.Debug("TempMovie object successfully loaded.", Program.moviequeue);
+                    Program._eh.ResetConsecutvieErrorCount();
 
                     Program.tempmoviestatus.Stage = 1;
                     Program.tempmoviestatus.MovieSource = Program.TempMovieSource;
                     UpdateTempMovieStatus(Program.tempmoviestatus);
+                    Log.Information("Temp Movie loaded.");
+                    Log.Information("Stage 0 complete.  Proceeding to Stage 1.");
                 }
-
             }
-
-            Console.WriteLine(DateTime.Now.ToString() + " - Temp Movie loaded.");
         }
 
         /// <summary>
@@ -282,7 +359,8 @@ namespace MovieDatabaseWorker
         public static void Stage01_DetermineAdd()
         {
             Console.Title = "Stage 1";
-            Console.WriteLine(DateTime.Now.ToString() + " - Determining addition conditions.");
+            Log.Information("Stage 1 - Determining addition conditions.");
+
             bool add = true;
             Program.DateOfError = String.Empty;
             Program.ErrorDescription = String.Empty;
