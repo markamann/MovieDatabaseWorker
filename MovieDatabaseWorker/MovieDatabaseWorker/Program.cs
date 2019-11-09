@@ -39,8 +39,8 @@ namespace MovieDatabaseWorker
                 {
                     Program.tempmoviestatus = Program.BLL_TempMovieStatus.SelectByID_model(1);
                     successful = (Program.tempmoviestatus != null);
-                    _eh.ResetConsecutvieErrorCount();
                     Log.Information("TempMovieStatus record loaded.");
+                    _eh.ResetConsecutvieErrorCount();
                 }
                 catch (Exception ex)
                 {

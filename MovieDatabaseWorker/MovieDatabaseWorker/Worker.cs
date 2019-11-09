@@ -264,9 +264,9 @@ namespace MovieDatabaseWorker
                         {
                             QuerySuccess = false;
                             resp = null;
+                            Program._eh.IncreaseConsecutvieErrorCount();
                             Log.Error("Stage00_GetNextTempMovie - There was an error loading the data from the API.", ex, resp);
                             Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                         Thread.Sleep(30000);
                     } while (!QuerySuccess);
@@ -318,9 +318,9 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             Program.tempmovie = null;
+                            Program._eh.IncreaseConsecutvieErrorCount();
                             Log.Error("Stage00_GetNextTempMovie - There was an error getting Movie by MovieJSON from the API.", ex);
                             Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (Program.tempmovie == null);
                     Log.Debug("TempMovie object successfully loaded.", Program.moviequeue);
@@ -588,9 +588,9 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
                     Log.Error("Stage02_SaveTempBusinessData - There was an error trying to insert into the TempBusinessData table.", ex);
                     Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                    Program._eh.IncreaseConsecutvieErrorCount();
                 }
             } while (!successful);
             Program._eh.ResetConsecutvieErrorCount();
@@ -621,9 +621,9 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
                     Log.Error("Stage02_SaveTempTechnialData - There was an error trying to insert into the TempTechnicalData table.", ex);
                     Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                    Program._eh.IncreaseConsecutvieErrorCount();
                 }
             } while (!successful);
             Program._eh.ResetConsecutvieErrorCount();
@@ -656,9 +656,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempCastMembers - There was an error trying to insert into the TempCastMembers table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -692,9 +692,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempDirectors - There was an error trying to insert into the TempDirectors table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -728,9 +728,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempWriters - There was an error trying to insert into the TempWriters table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -764,9 +764,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempSimpleTVEpisodes - There was an error trying to insert into the TempSimpleTVEpisodes table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -800,9 +800,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempCountries - There was an error trying to insert into the TempCountries table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -836,9 +836,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempFilmingLocations - There was an error trying to insert into the TempFilmingLocations table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -872,9 +872,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempFilmingGenres - There was an error trying to insert into the TempGenres table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -908,9 +908,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempLanguages - There was an error trying to insert into the TempLanguages table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -944,9 +944,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempMovieTrivia - There was an error trying to insert into the TempMovieTrivia table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -980,9 +980,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempAKAs - There was an error trying to insert into the TempAKAs table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -1016,9 +1016,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempSimilarMovie - There was an error trying to insert into the TempSimilarMovies table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -1052,9 +1052,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempGoofs - There was an error trying to insert into the TempGoofs table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -1092,9 +1092,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempKeywords - There was an error trying to insert into the TempKeywords table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -1122,9 +1122,9 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
                         Log.Error("Stage02_SaveTempMovieQuotes - There was an error trying to insert into the TempMovieQuotes table.", ex);
                         Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                        Program._eh.IncreaseConsecutvieErrorCount();
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -1150,9 +1150,9 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
                             Log.Error("Stage02_SaveTempMovieQuotes - There was an error trying to insert into the TempLines table.", ex);
                             Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (!successful);
                     Program._eh.ResetConsecutvieErrorCount();
@@ -1281,9 +1281,9 @@ namespace MovieDatabaseWorker
                     do
                     {
                         PersonID = MovieDatabase.MovieDatabase.AddPerson(c.ActorIMDBID, false);
-                        Log.Debug("Attempting to add person to the People table - " + c.ActorIMDBID);
+                        Log.Debug("Attempting to add person to the People table - " + c.ActorName);
                     } while (PersonID < 0);
-                    Log.Debug(c.ActorIMDBID + " successfully added to the People table. PersonID = " + PersonID.ToString());
+                    Log.Debug(c.ActorName + " successfully added to the People table. PersonID = " + PersonID.ToString());
 
                     Program.person = null;
                     do
@@ -1295,9 +1295,9 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             Program.person = null;
+                            Program._eh.IncreaseConsecutvieErrorCount();
                             Log.Error("Stage03_AddCastMembersToPeopleTable - There was an error trying to retrieve a person object from the People table.", ex, c);
                             Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (Program.person == null);
                     Program._eh.ResetConsecutvieErrorCount();
@@ -1319,9 +1319,9 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             addsuccess = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
                             Log.Error("Stage03_AddCastMembersToPeopleTable - There was an error trying to update a record in the TempCastMembers table.", ex, c);
                             Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
-                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (!addsuccess);
                     Program._eh.ResetConsecutvieErrorCount();
@@ -1361,13 +1361,13 @@ namespace MovieDatabaseWorker
 
             Console.Title = "Stage 4 - " + Program.tempmovie.Title;
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Adding Directors to People table beginning...");
+            Log.Information("Adding Directors to People table beginning...");
 
             if (Program.tempmovie.Directors.Count > 0)
             {
                 for (int x = 0; x < Program.tempmovie.Directors.Count; ++x)
                 {
-                    Console.WriteLine(DateTime.Now.ToString() + " - Director " + (x + 1).ToString() + " of " + Program.tempmovie.Directors.Count.ToString() + " - " + Program.tempmovie.Directors[x].Name + " started...");
+                    Log.Information("Director " + (x + 1).ToString() + " of " + Program.tempmovie.Directors.Count.ToString() + " - " + Program.tempmovie.Directors[x].Name + " started...");
 
                     DA.Models.MovieDatabase.TempDirector d;
                     if (!Program.tempmovie.Directors[x].InDatabase)
@@ -1378,7 +1378,9 @@ namespace MovieDatabaseWorker
                         do
                         {
                             PersonID = MovieDatabase.MovieDatabase.AddPerson(d.DirectorIMDBID, false);
+                            Log.Debug("Attempting to add person to the People table - " + d.Name);
                         } while (PersonID < 0);
+                        Log.Debug(d.Name + " successfully added to the People table. PersonID = " + PersonID.ToString());
 
                         Program.person = null;
                         do
@@ -1390,8 +1392,12 @@ namespace MovieDatabaseWorker
                             catch (Exception ex)
                             {
                                 Program.person = null;
+                                Program._eh.IncreaseConsecutvieErrorCount();
+                                Log.Error("Stage04_AddDirectorsToPeopleTable - There was an error trying to retrieve a person object from the People table.", ex, d);
+                                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                             }
                         } while (Program.person == null);
+                        Program._eh.ResetConsecutvieErrorCount();
 
                         d.DirectorPersonID = Program.person.PersonID;
                         d.InDatabase = true;
@@ -1412,40 +1418,44 @@ namespace MovieDatabaseWorker
                                 catch (Exception ex)
                                 {
                                     addsuccess = false;
+                                    Program._eh.IncreaseConsecutvieErrorCount();
+                                    Log.Error("Stage04_AddDirectorsToPeopleTable - There was an error trying to update a record in the TempDirectors table.", ex, d);
+                                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                                 }
                             } while (!addsuccess);
-                            Console.WriteLine(DateTime.Now.ToString() + " - " + Program.tempmovie.Directors[x].Name + " - Add to People complete.");
+                            Program._eh.ResetConsecutvieErrorCount();
+                            Log.Information(Program.tempmovie.Directors[x].Name + " - Add to People complete.");
                         }
                         else
                         {
                             // Try rebuilding.
+                            Log.Debug("Stage04_AddDirectorsToPeopleTable - There was a issue.  Attempting to rebuild the tempmovie object. ", d);
                             BuildTempMovieFromTempTables();
                         }
                     }
 
                     bool alladded = true;
-                    Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Directors added...");
+                    Log.Information("Checking that all Directors added...");
                     for (int b = 0; b < Program.tempmovie.Directors.Count; ++b)
                     {
                         if (!Program.tempmovie.Directors[b].InDatabase)
                         {
                             alladded = false;
-                            Console.WriteLine(DateTime.Now.ToString() + " - All directors NOT added.  Repeating.");
+                            Log.Information("All directors NOT added.  Repeating.");
                         }
                     }
 
                     if (alladded)
                     {
-                        Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Directors added complete.");
+                        Log.Information("Checking that all Directors added complete.");
                         Program.tempmoviestatus.Stage = 5;
                         UpdateTempMovieStatus(Program.tempmoviestatus);
                     }
-
                 }
             }
             else
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - No directors.  Moving on.");
+                Log.Information("No directors.  Moving on.");
                 Program.tempmoviestatus.Stage = 5;
                 UpdateTempMovieStatus(Program.tempmoviestatus);
             }
@@ -1464,13 +1474,13 @@ namespace MovieDatabaseWorker
 
             Console.Title = "Stage 5 - " + Program.tempmovie.Title;
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Adding writers to People table beginning...");
+            Log.Information("Adding writers to People table beginning...");
 
             if (Program.tempmovie.Writers.Count > 0)
             {
                 for (int x = 0; x < Program.tempmovie.Writers.Count; ++x)
                 {
-                    Console.WriteLine(DateTime.Now.ToString() + " - Writers " + (x + 1).ToString() + " of " + Program.tempmovie.Writers.Count.ToString() + " - " + Program.tempmovie.Writers[x].Name + " started...");
+                    Log.Information("Writers " + (x + 1).ToString() + " of " + Program.tempmovie.Writers.Count.ToString() + " - " + Program.tempmovie.Writers[x].Name + " started...");
 
                     DA.Models.MovieDatabase.TempWriter w;
 
@@ -1482,7 +1492,9 @@ namespace MovieDatabaseWorker
                         do
                         {
                             PersonID = MovieDatabase.MovieDatabase.AddPerson(w.WriterIMDBID, false);
+                            Log.Debug("Attempting to add person to the People table - " + w.Name);
                         } while (PersonID < 0);
+                        Log.Debug(w.Name + " successfully added to the People table. PersonID = " + PersonID.ToString());
 
                         Program.person = null;
                         do
@@ -1494,8 +1506,12 @@ namespace MovieDatabaseWorker
                             catch (Exception ex)
                             {
                                 Program.person = null;
+                                Program._eh.IncreaseConsecutvieErrorCount();
+                                Log.Error("Stage04_AddWritersToPeopleTable - There was an error trying to update a record in the TempCastMembers table.", ex, w);
+                                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                             }
                         } while (Program.person == null);
+                        Program._eh.ResetConsecutvieErrorCount();
 
                         w.WriterPersonID = Program.person.PersonID;
                         w.InDatabase = true;
@@ -1516,39 +1532,45 @@ namespace MovieDatabaseWorker
                                 catch (Exception ex)
                                 {
                                     addsuccess = false;
+                                    Program._eh.IncreaseConsecutvieErrorCount();
+                                    Log.Error("Stage05_AddWritersToPeopleTable - There was an error trying to update a record in the TempWriters table.", ex, w);
+                                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                                 }
                             } while (addsuccess == false);
-                            Console.WriteLine(DateTime.Now.ToString() + " - " + Program.tempmovie.Writers[x].Name + " - Add to People complete.");
+                            Program._eh.ResetConsecutvieErrorCount();
+
+                            Log.Information(Program.tempmovie.Writers[x].Name + " - Add to People complete.");
                         }
                         else
                         {
                             // Try rebuilding.
+                            Log.Debug("Stage04_AddDirectorsToPeopleTable - There was a issue.  Attempting to rebuild the tempmovie object. ");
                             BuildTempMovieFromTempTables();
                         }
                     }
                 }
 
                 bool alladded = true;
-                Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Writers added...");
+                Log.Information("Checking that all Writers added...");
                 for (int b = 0; b < Program.tempmovie.Writers.Count; ++b)
                 {
                     if (!Program.tempmovie.Writers[b].InDatabase)
                     {
                         alladded = false;
-                        Console.WriteLine(DateTime.Now.ToString() + " - All writers NOT added.  Repeating.");
+                        Log.Information("All writers NOT added.  Repeating.");
                     }
                 }
 
                 if (alladded)
                 {
-                    Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Writers added complete.");
+                    Log.Information("Checking that all Writers added complete.");
                     Program.tempmoviestatus.Stage = 6;
                     UpdateTempMovieStatus(Program.tempmoviestatus);
                 }
             }
             else
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - No writers.  Moving on.");
+                Log.Information("No writers.  Moving on.");
                 Program.tempmoviestatus.Stage = 6;
                 UpdateTempMovieStatus(Program.tempmoviestatus);
             }
