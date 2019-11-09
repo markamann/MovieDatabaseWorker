@@ -1168,7 +1168,7 @@ namespace MovieDatabaseWorker
         /// </summary>
         public static void BuildTempMovieFromTempTables()
         {
-            Console.WriteLine(DateTime.Now.ToString() + " - Building TempMovie from tables started...");
+            Log.Information("Building TempMovie from tables started...");
             Program.tempmovie = Program.BLL_TempMovie.SelectByID_model(1);
 
             // TempBusinessData
@@ -1251,7 +1251,7 @@ namespace MovieDatabaseWorker
                 }
                 Program.tempmovie.MovieQuotes.Add(qu);
             }
-            Console.WriteLine(DateTime.Now.ToString() + " - Building TempMovie from tables complete.");
+            Log.Information("Building TempMovie from tables complete.");
         }
 
         #endregion
@@ -1267,11 +1267,11 @@ namespace MovieDatabaseWorker
 
             Console.Title = "Stage 3 - " + Program.tempmovie.Title;
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Adding Cast Members to People table started...");
+            Log.Information("Adding Cast Members to People table started...");
 
             for (int x = 0; x < Program.tempmovie.Cast.Count; ++x)
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - Cast Member " + (x + 1).ToString() + " of " + Program.tempmovie.Cast.Count.ToString() + " - " + Program.tempmovie.Cast[x].ActorName + " started...");
+                Log.Information("Cast Member " + (x + 1).ToString() + " of " + Program.tempmovie.Cast.Count.ToString() + " - " + Program.tempmovie.Cast[x].ActorName + " started...");
 
                 DA.Models.MovieDatabase.TempCastMember c;
                 if (!Program.tempmovie.Cast[x].InDatabase)
@@ -1281,7 +1281,9 @@ namespace MovieDatabaseWorker
                     do
                     {
                         PersonID = MovieDatabase.MovieDatabase.AddPerson(c.ActorIMDBID, false);
+                        Log.Debug("Attempting to add person to the People table - " + c.ActorIMDBID);
                     } while (PersonID < 0);
+                    Log.Debug(c.ActorIMDBID + " successfully added to the People table. PersonID = " + PersonID.ToString());
 
                     Program.person = null;
                     do
@@ -1293,8 +1295,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             Program.person = null;
+                            Log.Error("Stage03_AddCastMembersToPeopleTable - There was an error trying to retrieve a person object from the People table.", ex, c);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
+                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (Program.person == null);
+                    Program._eh.ResetConsecutvieErrorCount();
 
                     c.PersonID = Program.person.PersonID;
                     c.InDatabase = true;
@@ -1313,28 +1319,32 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             addsuccess = false;
+                            Log.Error("Stage03_AddCastMembersToPeopleTable - There was an error trying to update a record in the TempCastMembers table.", ex, c);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
+                            Program._eh.IncreaseConsecutvieErrorCount();
                         }
                     } while (!addsuccess);
+                    Program._eh.ResetConsecutvieErrorCount();
                 }
-                Console.WriteLine(DateTime.Now.ToString() + " - " + Program.tempmovie.Cast[x].ActorName + " - Add to People complete.");
+                Log.Information(Program.tempmovie.Cast[x].ActorName + " - Add to People complete.");
             }
 
             bool alladded = true;
-            Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Cast Members added...");
+            Log.Information("Checking that all Cast Members added...");
             for (int a = 0; a < Program.tempmovie.Cast.Count; ++a)
             {
                 if (!Program.tempmovie.Cast[a].InDatabase)
                 {
                     alladded = false;
-                    Console.WriteLine(DateTime.Now.ToString() + " - All cast members NOT added.  Repeating.");
+                    Log.Information("All cast members NOT added.  Repeating.");
                 }
             }
 
             if (alladded)
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - Checking that all Cast Members added complete.");
                 Program.tempmoviestatus.Stage = 4;
                 UpdateTempMovieStatus(Program.tempmoviestatus);
+                Log.Information("Checking that all Cast Members added complete.");
             }
         }
 
