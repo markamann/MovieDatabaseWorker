@@ -1600,28 +1600,28 @@ namespace MovieDatabaseWorker
                 // The movie already exists.  Lookup movie to get MovieID.
                 Program.movie = Program.BLL_Movies.SelectByIMDBID_model(Program.tempmovie.IMDBID);
                 MovieID = Program.movie.MovieID;
-                Console.WriteLine(DateTime.Now.ToString() + " - The movie already exists in the Movies table.  Looking up MovieID.");
+                Log.Information("The movie already exists in the Movies table.  Looking up MovieID.");
             }
             else
             {
-                Console.WriteLine(DateTime.Now.ToString() + " - The movie does not exist in the Movies table.  Proceeding with add.");
+                Log.Information("The movie does not exist in the Movies table.  Proceeding with add.");
                 // The movie does not exist.  Proceed with add.
                 MovieID = Stage06_AddMovieToMovieTable();
-                Console.WriteLine(DateTime.Now.ToString() + " - Movie added to Movies table.");
+                Log.Information("Movie added to Movies table.");
             }
 
             Stage06_AdjustMoviePosterFilenames();
             Stage06_UpdateMovie();
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie filenames have been adjusted.");
+            Log.Information("Movie filenames have been adjusted.");
 
             Stage06_DownloadMoviePosterLocally();
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie poster downloaded locally.");
+            Log.Information("Movie poster downloaded locally.");
 
             Stage06_UploadMoviePosterToWeb();
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie poster uploaded to web.");
+            Log.Information("Movie poster uploaded to web.");
 
             Stage06_SaveMoviePosterToDatabase();
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie poster added to MoviePosters table in the database.");
+            Log.Information("Movie poster added to MoviePosters table in the database.");
 
             // Now that the movie has been added to the Movies table,
             // update all temp tables with the new MovieID. This is in case
@@ -1630,80 +1630,80 @@ namespace MovieDatabaseWorker
 
             // Update TempMovie
             Stage06_UpdateTempMovie(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - TempMovie data updated.");
+            Log.Information("TempMovie data updated.");
 
             // Update TempBusinessData
             Stage06_UpdateTempBusinessData(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Business data updated.");
+            Log.Information("Business data updated.");
 
             // Update TempTechnicalData
             Stage06_UpdateTempTechnicalData(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Technical data updated.");
+            Log.Information("Technical data updated.");
 
             // Update TempCastMembers
             Stage06_UpdateTempCastMembers(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Cast updated.");
+            Log.Information("Cast updated.");
 
             // Update TempDirectors
             Stage06_UpdateTempDirectors(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Directors updated.");
+            Log.Information("Directors updated.");
 
             // Update TempWriters
             Stage06_UpdateTempWriters(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Writers updated.");
+            Log.Information("Writers updated.");
 
             // Update TempCountries
             Stage06_UpdateTempCountries(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Countries updated.");
+            Log.Information("Countries updated.");
 
             // Update TempFilmingLocations
             Stage06_UpdateTempFilmingLocations(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Filming locations updated.");
+            Log.Information("Filming locations updated.");
 
             // Update TempGenres
             Stage06_UpdateTempGenres(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Genres updated.");
+            Log.Information("Genres updated.");
 
             // Update TempLanguages
             Stage06_UpdateTempLanguages(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Languages updated.");
+            Log.Information("Languages updated.");
 
             // Update TempMovieTrivia
             Stage06_UpdateTempMovieTrivia(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie trivia updated.");
+            Log.Information("Movie trivia updated.");
 
             // Update TempAKAs
             Stage06_UpdateTempAKAs(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - AKAs updated.");
+            Log.Information("AKAs updated.");
 
             // Update TempSimilarMovies
             Stage06_UpdateTempSimilarMovies(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Similar movies updated.");
+            Log.Information("Similar movies updated.");
 
             // Update TempMovieQuotes
             Stage06_UpdateTempMovieQuotes(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie quotes updated.");
+            Log.Information("Movie quotes updated.");
 
             // Update TempGoofs
             Stage06_UpdateTempGoofs(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Goofs movies updated.");
+            Log.Information("Goofs movies updated.");
 
             // Update TempSimpleEpisodes
             Stage06_UpdateTempSimpleEpisodes(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Simple TV episodes updated.");
+            Log.Information("Simple TV episodes updated.");
 
             // If this is a TV Episode, make sure the series
             // SimpleTVEpisodes EpisodeMovieID is updated.
             if (Program.tempmovie.Type.Equals("TV Episode"))
             {
                 Stage06_UpdateEpisodeMovieID(MovieID);
-                Console.WriteLine(DateTime.Now.ToString() + " - Series Simple TV episodes EpisodeMovieID updated.");
+                Log.Information("Series Simple TV episodes EpisodeMovieID updated.");
             }
 
             // Update Filmographies
-             Stage06_UpdateFilmographies(Program.tempmovie.IMDBID, MovieID);
+            Stage06_UpdateFilmographies(Program.tempmovie.IMDBID, MovieID);
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Stage 6 complete.");
+            Log.Information("Stage 6 complete.");
 
             Program.tempmoviestatus.Stage = 7;
             UpdateTempMovieStatus(Program.tempmoviestatus);
@@ -1760,8 +1760,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     movieid = -1;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage06_AddMovieToMovieTable - There was an error trying to add the tempmovie to the Movies table.", ex);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (movieid == -1);
+            Program._eh.ResetConsecutvieErrorCount();
 
             return movieid;
         }
@@ -1826,8 +1830,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage06_UpdateMovie - There was an error trying to update the Movies table.", ex, Program.movie);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -1859,15 +1867,19 @@ namespace MovieDatabaseWorker
                     }
                     catch (Exception ex)
                     {
-
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_DownloadMoviePosterLocally - There was an error trying to download the movie poster from IMDB using the URL returned by the API.", ex, Program.movie.IMDBPosterURL);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!File.Exists(Program.movie.LocalPosterPath));
+                Program._eh.ResetConsecutvieErrorCount();
             }
             else
             {
                 // IMDB does not have a photo for this movie.  Point it to blank.
                 DA.Models.MovieDatabase.WorkerConfiguration config = Program.BLL_WorkerConfiguration.SelectByID_model(1);
                 File.Copy(config.MovieBlankPosterPath, Program.movie.LocalPosterPath, true);
+                Log.Debug("Stage06_DownloadMoviePosterLocally - There was no movie photo URL provided.  Using blank.");
             }
         }
 
@@ -1886,8 +1898,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     uploadsuccess = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage06_UploadMoviePosterToWeb - There was an error trying to upload the movie poster from the local path to the web.", ex, Program.movie.LocalPosterPath);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!uploadsuccess);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -1922,6 +1938,8 @@ namespace MovieDatabaseWorker
             {
                 photo.Width = -1;
                 photo.Height = -1;
+                Log.Error("Stage06_SaveMoviePosterToDatabase - There was an error trying to convert the local movie poster photo to an Image object to get width and height.", ex, Program.movie.LocalPosterPath);
+                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
             }
 
             FileInfo fi = new FileInfo(Program.movie.LocalPosterFolder + "\\" + Program.movie.PosterFilename);
@@ -1940,10 +1958,12 @@ namespace MovieDatabaseWorker
                 }
                 else
                 {
+                    Log.Debug("Attempting to insert the movie poster data into the MoviePosters table.");
                     Program.BLL_MoviePosters.Insert(ref photo);
                     successful = Program.BLL_MoviePosters.Contains(Program.movie.MovieID);
                 }
             } while (!successful);
+            Log.Debug("Insert the movie poster data into the MoviePosters table successful.");
         }
 
         /// <summary>
@@ -2001,8 +2021,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempCastMembers - There was an error trying to update the TempCastMembers table with the new MovieID.", ex, ttcm);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2029,8 +2053,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempDirectors - There was an error trying to update the TempDirectors table with the new MovieID.", ex, tdd);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2057,8 +2085,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempWriters - There was an error trying to update the TempDirectors table with the new MovieID.", ex, tww);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2085,8 +2117,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempCountries - There was an error trying to update the TempWriters table with the new MovieID.", ex, tcc);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2113,8 +2149,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempFilmingLocations - There was an error trying to update the TempFilmingLocations table with the new MovieID.", ex, ttfl);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2141,8 +2181,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempGenres - There was an error trying to update the TempGenres table with the new MovieID.", ex, ttg);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2169,8 +2213,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempLanguages - There was an error trying to update the TempLanguages table with the new MovieID.", ex, ttl);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2197,8 +2245,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempMovieTrivia - There was an error trying to update the TempMovieTrivia table with the new MovieID.", ex, ttmt);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2225,8 +2277,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempAKAs - There was an error trying to update the TempAKAs table with the new MovieID.", ex, tta);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2253,8 +2309,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempSimilarMovies - There was an error trying to update the TempSimilarMovies table with the new MovieID.", ex, ttsm);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2281,8 +2341,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempMovieQuotes - There was an error trying to update the TempMovieQuotes table with the new MovieID.", ex, ttmq);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2309,8 +2373,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempGoofs - There was an error trying to update the TempGoofs table with the new MovieID.", ex, ttgo);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2337,8 +2405,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage06_UpdateTempSimpleTVEpisodes - There was an error trying to update the TempSimpleTVEpisodes table with the new MovieID.", ex, ttse);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2374,8 +2446,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage06_UpdateEpisodeMovieID - There was an error trying to update the TempSimpleTVEpisodes table with the new EpisodeMovieID.", ex, tve[b]);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
                 }
             }
         }
@@ -2406,8 +2482,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage06_UpdateFilmographies - There was an error trying to update the Filmographies.", ex, imdbid, movieid);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         #endregion
