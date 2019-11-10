@@ -2496,99 +2496,99 @@ namespace MovieDatabaseWorker
 
         public void Stage07_AddFinalTables()
         {
-            Console.WriteLine(DateTime.Now.ToString() + " - Final save beginning...");
+            Log.Information("Final save beginning...");
 
             if (Program.tempmovie == null)
             {
                 do
                 {
+                    Log.Debug("The tempmovie object is null.  Attempting to rebuild tempmovie from temp tables.");
                     BuildTempMovieFromTempTables();
                 } while (Program.tempmovie == null);
             }
-            Console.WriteLine(DateTime.Now.ToString() + " - Temp movie loaded.");
+            Log.Information("Temp movie loaded.");
 
             if (Program.movie == null)
             {
                 do
                 {
+                    Log.Debug("The movie object is null.  Attempting to rebuild movie object from the database table.");
                     Program.movie = Program.BLL_Movies.SelectByIMDBID_model(Program.tempmovie.IMDBID);
                 } while (Program.movie == null);
             }
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie loaded.");
+            Log.Information("Movie loaded.");
 
             Console.Title = "Stage 7 - " + Program.tempmovie.Title;
 
-            bool QuerySuccess = false;
-            bool InDatabase = false;
             long MovieID = -1;
 
             MovieID = Program.movie.MovieID;
 
             // Save BusinessData
             Stage07_SaveBusinessData();
-            Console.WriteLine(DateTime.Now.ToString() + " - Business data saved.");
+            Log.Information("Business data saved.");
 
             // Save TechnicalData
             Stage07_SaveTechnicalData();
-            Console.WriteLine(DateTime.Now.ToString() + " - Technical data saved.");
+            Log.Information("Technical data saved.");
 
             // Save Cast Members
             Stage07_SaveCastMembers(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Cast saved.");
+            Log.Information("Cast saved.");
 
             // Save Directors
             Stage07_SaveDirectors(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Directors saved.");
+            Log.Information("Directors saved.");
 
             // Save Writers
             Stage07_SaveWriters(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Writers saved.");
+            Log.Information("Writers saved.");
 
             // Save Countries
             Stage07_SaveCountries(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Countries saved.");
+            Log.Information("Countries saved.");
 
             // Save Filming Locations
             Stage07_SaveFilmingLocations(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Filming locations saved.");
+            Log.Information("Filming locations saved.");
 
             // Save Genres
             Stage07_SaveGenres(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Genres saved.");
+            Log.Information("Genres saved.");
 
             // Save Languages
             Stage07_SaveLanguages(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Languages saved.");
+            Log.Information("Languages saved.");
 
             // Save Movie Trivia
             Stage07_SaveMovieTrivia(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie trivia saved.");
+            Log.Information("Movie trivia saved.");
 
             // Save AKAs
             Stage07_SaveAKAs(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - AKAs saved.");
+            Log.Information("AKAs saved.");
 
             // Save Similar Movies
             Stage07_SaveSimilarMovies(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Similar movies saved.");
+            Log.Information("Similar movies saved.");
 
             // Save Movie Quotes
             Stage07_SaveMovieQuotes(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie quotes saved.");
+            Log.Information("Movie quotes saved.");
 
             // Save Goofs
             Stage07_SaveGoofs(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Goofs saved.");
+            Log.Information("Goofs saved.");
 
             // Save Keywords
             Stage07_SaveKeywords(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Keywords saved.");
+            Log.Information("Keywords saved.");
 
             // Save Simple Episodes
             Stage07_SaveSimpleEpisodes(MovieID);
-            Console.WriteLine(DateTime.Now.ToString() + " - Simple episodes saved.");
+            Log.Information("Simple episodes saved.");
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Final save complete.");
+            Log.Information("Final save complete.");
 
             Program.tempmoviestatus.Stage = 8;
             UpdateTempMovieStatus(Program.tempmoviestatus);
@@ -2604,8 +2604,10 @@ namespace MovieDatabaseWorker
             {
                 do
                 {
+                    Log.Debug("Loading business data object started.");
                     b = Program.BLL_BusinessData.SelectByMovieID_model(Program.tempmovie.MovieID);
                 } while (b == null);
+                Log.Debug("Business data object loaded.");
 
                 b.MovieID = Program.tempmovie.MovieID;
                 b.Budget = Program.tempmovie.BusinessData.Budget;
@@ -2624,8 +2626,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage07_SaveBusinessData - There was an error trying to update the BusinessData table.", ex, b);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
             else
             {
@@ -2647,8 +2653,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage07_SaveBusinessData - There was an error trying to update the BusinessData table.", ex, b);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2662,8 +2672,10 @@ namespace MovieDatabaseWorker
             {
                 do
                 {
+                    Log.Debug("Loading technical data object started.");
                     t = Program.BLL_TechnicalData.SelectByMovieID_model(Program.tempmovie.MovieID);
                 } while (t == null);
+                Log.Debug("Technical data object loaded.");
 
                 t.MovieID = Program.tempmovie.MovieID;
                 t.Runtime = Program.tempmovie.TechnicalData.Runtime;
@@ -2688,8 +2700,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage07_SaveTechnicalData - There was an error trying to update the TechnicalData table.", ex, t);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
             else
             {
@@ -2717,8 +2733,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage07_SaveTechnicalData - There was an error trying to update the TechnicalData table.", ex, t);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -2747,8 +2767,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveCastMembers - There was an error trying to delete pre-existing CastMembers from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2765,8 +2789,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveCastMembers - There was an error trying to update the PersonIDs in the TempCastMembers table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2786,8 +2814,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveCastMembers - There was an error trying to insert the final records into the CastMembers table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -2815,8 +2847,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveDirectors - There was an error trying to delete pre-existing Directors from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2833,8 +2869,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveDirectors - There was an error trying to update the PersonIDs in the TempDirectors table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2854,8 +2894,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveDirectors - There was an error trying to insert the final records into the Directors table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -2883,8 +2927,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveWriters - There was an error trying to delete pre-existing Writers from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2901,8 +2949,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveWriters - There was an error trying to update the PersonIDs in the TempWriters table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2922,8 +2974,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveWriters - There was an error trying to insert the final records into the Writers table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -2951,8 +3007,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveCountries - There was an error trying to delete pre-existing Countries from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -2972,8 +3032,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveCountries - There was an error trying to insert the final records into the Countries table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3001,8 +3065,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveFilmingLocations - There was an error trying to delete pre-existing FilmingLocations from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3022,8 +3090,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveFilmingLocations - There was an error trying to insert the final records into the FilmingLocations table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3051,8 +3123,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveGenres - There was an error trying to delete pre-existing Genres from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3072,8 +3148,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveGenres - There was an error trying to insert the final records into the Genres table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3101,8 +3181,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveLanguages - There was an error trying to delete pre-existing Languages from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3122,8 +3206,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveLanguages - There was an error trying to insert the final records into the Languages table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3151,8 +3239,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveMovieTrivia - There was an error trying to delete pre-existing MovieTrivia from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3172,8 +3264,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveMovieTrivia - There was an error trying to insert the final records into the MovieTrivia table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3201,8 +3297,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveAKAs - There was an error trying to delete pre-existing AKAs from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3222,8 +3322,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveAKAs - There was an error trying to insert the final records into the AKAs table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3251,8 +3355,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveSimilarMovies - There was an error trying to delete pre-existing SimilarMovies from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3272,8 +3380,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveSimilarMovies - There was an error trying to insert the final records into the SimilarMovies table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3313,8 +3425,12 @@ namespace MovieDatabaseWorker
                     catch (Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("Stage07_SaveMovieQuotes - There was an error trying to insert the final records into the MovieQuotes table.", ex, sSql);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
 
                 templines = Program.BLL_TempLines.SelectByTempQuoteID_model(Program.tempmovie.MovieQuotes[a].TempQuoteID);
                 if (templines != null)
@@ -3340,8 +3456,12 @@ namespace MovieDatabaseWorker
                             catch (Exception ex)
                             {
                                 successful = false;
+                                Program._eh.IncreaseConsecutvieErrorCount();
+                                Log.Error("Stage07_SaveMovieQuotes - There was an error trying to insert the final records into the Lines table.", ex, sSql);
+                                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                             }
                         } while (!successful);
+                        Program._eh.ResetConsecutvieErrorCount();
                     }
                 }
             }
@@ -3372,8 +3492,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveGoofs - There was an error trying to delete pre-existing Goofs from the table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
 
             successful = false;
             do
@@ -3393,8 +3517,12 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("Stage07_SaveGoofs - There was an error trying to insert the final records into the Goofs table.", ex, sSql);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!successful);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3420,8 +3548,10 @@ namespace MovieDatabaseWorker
                     keywordlist = null;
                     do
                     {
+                        Log.Debug("Attempting to lookup the KeywordList object.", Program.tempmovie.Keywords[a]);
                         keywordlist = Program.BLL_KeywordList.SelectByKeyword_model(Program.tempmovie.Keywords[a]);
                     } while (keywordlist == null);
+                    Log.Debug("KeywordList object lookup successful.", Program.tempmovie.Keywords[a]);
                 }
                 else
                 {
@@ -3441,8 +3571,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage07_SaveKeywords - There was an error trying to insert the keyword into the KeywordList table.", ex, keywordlist.Keyword);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
                     keywordlist.KeywordID = keywordid;
                 }
 
@@ -3453,8 +3587,10 @@ namespace MovieDatabaseWorker
                 {
                     do
                     {
+                        Log.Debug("Attempting to lookup the Keyword model object.", Program.tempmovie.MovieID, keywordlist.KeywordID);
                         keyword = Program.BLL_Keywords.SelectByMovieIDKeywordID_model(Program.tempmovie.MovieID, keywordlist.KeywordID);
                     } while (keyword == null);
+                    Log.Debug("Keyword model object lookup successful.", Program.tempmovie.MovieID, keywordlist.KeywordID);
 
                     keyword.MovieID = Program.tempmovie.MovieID;
                     keyword.KeywordID = keywordlist.KeywordID;
@@ -3470,8 +3606,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage07_SaveKeywords - There was an error trying to update the Keywords table.", ex, keyword);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
                 }
                 else
                 {
@@ -3490,8 +3630,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage07_SaveKeywords - There was an error trying to insert iinto the Keywords table.", ex, keyword);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
                 }
             }
         }
@@ -3517,8 +3661,10 @@ namespace MovieDatabaseWorker
                 {
                     do
                     {
+                        Log.Debug("Attempting to lookup the SimpleTVEpisode object.", Program.tempmovie.SimpleTVEpisodes[a].SeriesIMDBID, Program.tempmovie.SimpleTVEpisodes[a].EpisodeTitle);
                         se = Program.BLL_SimpleTVEpisodes.SelectBySeriesIMDBIDEpisodeTitle_model(Program.tempmovie.SimpleTVEpisodes[a].SeriesIMDBID, Program.tempmovie.SimpleTVEpisodes[a].EpisodeTitle);
                     } while (se == null);
+                    Log.Debug("SimpleTVEpisode object lookup complete.", Program.tempmovie.SimpleTVEpisodes[a].SeriesIMDBID, Program.tempmovie.SimpleTVEpisodes[a].EpisodeTitle);
 
                     se.SeriesMovieID = Program.tempmovie.SimpleTVEpisodes[a].SeriesMovieID;
                     se.SeriesIMDBID = Program.tempmovie.SimpleTVEpisodes[a].SeriesIMDBID;
@@ -3546,8 +3692,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage07_SaveSimpleEpisodes - There was an error trying to update the SimpleTVEpisodes table.", ex, se);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
 
                     // Check if episode is in TVEpisodeQueue
                     // Now, make sure the episode is also in the
@@ -3582,8 +3732,12 @@ namespace MovieDatabaseWorker
                             catch (Exception ex)
                             {
                                 successful = false;
+                                Program._eh.IncreaseConsecutvieErrorCount();
+                                Log.Error("Stage07_SaveSimpleEpisodes - There was an error trying to update the TVEpisodeQueue table.", ex, teq);
+                                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                             }
                         } while (!successful);
+                        Program._eh.ResetConsecutvieErrorCount();
                     }
                 }
                 else
@@ -3615,8 +3769,12 @@ namespace MovieDatabaseWorker
                         catch (Exception ex)
                         {
                             successful = false;
+                            Program._eh.IncreaseConsecutvieErrorCount();
+                            Log.Error("Stage07_SaveSimpleEpisodes - There was an error trying to insert into the SimpleTVEpisodes table.", ex, se);
+                            Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                         }
                     } while (!successful);
+                    Program._eh.ResetConsecutvieErrorCount();
 
                     // Now, make sure the episode is also in the
                     // TVEpisodeQueue.  Only INSERT is handled.
@@ -3650,8 +3808,12 @@ namespace MovieDatabaseWorker
                             catch (Exception ex)
                             {
                                 successful = false;
+                                Program._eh.IncreaseConsecutvieErrorCount();
+                                Log.Error("Stage07_SaveSimpleEpisodes - There was an error trying to insert into the TVEpisodeQueue table.", ex, teq);
+                                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                             }
                         } while (!successful);
+                        Program._eh.ResetConsecutvieErrorCount();
                     }
                 }
             }
@@ -3719,6 +3881,7 @@ namespace MovieDatabaseWorker
                     success = false;
                 }
             } while (success == false);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3771,6 +3934,7 @@ namespace MovieDatabaseWorker
                     success = false;
                 }
             } while (!success);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3815,6 +3979,7 @@ namespace MovieDatabaseWorker
                         successful = false;
                     }
                 } while (!successful);
+                Program._eh.ResetConsecutvieErrorCount();
             }
         }
 
@@ -3837,6 +4002,7 @@ namespace MovieDatabaseWorker
                     success = false;
                 }
             } while (!success);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3858,6 +4024,7 @@ namespace MovieDatabaseWorker
                     success = false;
                 }
             } while (!success);
+            Program._eh.ResetConsecutvieErrorCount();
         }
 
         /// <summary>
@@ -3871,8 +4038,6 @@ namespace MovieDatabaseWorker
             returnvaleue = today.Year.ToString().PadLeft(4, '0') + today.Month.ToString().PadLeft(2, '0') + today.Day.ToString().PadLeft(2, '0') + today.Hour.ToString().PadLeft(2, '0') + today.Minute.ToString().PadLeft(2, '0') + today.Second.ToString().PadLeft(2, '0') + today.Millisecond.ToString().PadLeft(3, '0');
             return returnvaleue;
         }
-
-
 
         private static bool FTPUploadFile(String filetoupload, String ftpuri, String ftpusername, String ftppassword)
         {
