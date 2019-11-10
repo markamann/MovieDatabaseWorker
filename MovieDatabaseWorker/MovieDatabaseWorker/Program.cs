@@ -15,13 +15,13 @@ namespace MovieDatabaseWorker
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.ColoredConsole()
-                .WriteTo.File("Logs\\Log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(@"F:\Programs\Logs\MovieDatabaseWorker\Debug\Log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 #else
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information();
                 .WriteTo.ColoredConsole()
-                .WriteTo.File("Logs\\Log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(@"F:\Programs\Logs\MovieDatabaseWorker\Production\Log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 #endif
 

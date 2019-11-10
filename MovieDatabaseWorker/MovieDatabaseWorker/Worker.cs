@@ -3831,7 +3831,7 @@ namespace MovieDatabaseWorker
 
             Console.Title = "Stage 8 - " + Program.tempmovie.Title;
 
-            Console.WriteLine(DateTime.Now.ToString() + " - Movie processed.  Reset beginning...");
+            Log.Information("Movie processed.  Reset beginning...");
 
             // Delete movie from queues by IMDBID
             Program.BLL_MovieQueue.DeleteByIMDBID(Program.tempmovie.IMDBID);
@@ -3849,8 +3849,8 @@ namespace MovieDatabaseWorker
 
             Program.tempmovie = null;
             Program.movie = null;
-            Console.WriteLine(DateTime.Now.ToString() + " - Reset complete.");
-            Console.WriteLine("******************************");
+            Log.Information("Reset complete.");
+            Log.Information("************************************************************");
         }
 
         #endregion
