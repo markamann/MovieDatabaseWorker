@@ -3866,7 +3866,7 @@ namespace MovieDatabaseWorker
         public static void UpdateTempMovieStatus(DA.Models.MovieDatabase.TempMovieStatus tempmoviestatus)
         {
             DA.Models.MovieDatabase.TempMovieStatus verify_tms = tempmoviestatus;
-            bool success = false;
+            bool successful = false;
 
             do
             {
@@ -3874,13 +3874,16 @@ namespace MovieDatabaseWorker
                 {
                     Program.BLL_TempMovieStatus.Update(ref Program.tempmoviestatus);
                     Program.tempmoviestatus = Program.BLL_TempMovieStatus.SelectByID_model(1);
-                    success = ((Program.tempmoviestatus.Stage == verify_tms.Stage) && (Program.tempmoviestatus.MovieSource.Equals(verify_tms.MovieSource)));
+                    successful = ((Program.tempmoviestatus.Stage == verify_tms.Stage) && (Program.tempmoviestatus.MovieSource.Equals(verify_tms.MovieSource)));
                 }
-                catch
+                catch(Exception ex)
                 {
-                    success = false;
+                    successful = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("UpdateTempMovieStatus - There was an error trying to update the TempMovieStatus table.", ex, Program.tempmoviestatus);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
-            } while (success == false);
+            } while (!successful);
             Program._eh.ResetConsecutvieErrorCount();
         }
 
@@ -3890,8 +3893,6 @@ namespace MovieDatabaseWorker
         /// </summary>
         public void CheckStartingState()
         {
-            bool QuerySuccess = false;
-
             if ((Program.tempmoviestatus.Stage == 1) || (Program.tempmoviestatus.Stage == 2))
             {
                 Program.tempmoviestatus.Stage = 0;
@@ -3932,6 +3933,9 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     success = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("AddToMovieQueueErrors - There was an error trying to insert into the MovieQueue_Errors table.", ex, moviequeueerror);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!success);
             Program._eh.ResetConsecutvieErrorCount();
@@ -3974,9 +3978,12 @@ namespace MovieDatabaseWorker
                         Program.BLL_TVEpisodeQueue_Errors.Insert(ref tvepisodequeueerror);
                         successful = Program.BLL_TVEpisodeQueue_Errors.Contains(tvepisodequeueerror.EpisodeIMDBID);
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         successful = false;
+                        Program._eh.IncreaseConsecutvieErrorCount();
+                        Log.Error("AddToTVEpisodeQueueErrors - There was an error trying to insert into the TVEpisodeQueue_Errors table.", ex, tvepisodequeueerror);
+                        Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                     }
                 } while (!successful);
                 Program._eh.ResetConsecutvieErrorCount();
@@ -4000,6 +4007,9 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     success = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("DeleteFromMovieQueue - There was an error trying to insert into the MovieQueue table by the given IMDBID.", ex, imdbid);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!success);
             Program._eh.ResetConsecutvieErrorCount();
@@ -4022,6 +4032,9 @@ namespace MovieDatabaseWorker
                 catch (Exception ex)
                 {
                     success = false;
+                    Program._eh.IncreaseConsecutvieErrorCount();
+                    Log.Error("DeleteFromTVEpisodeQueue - There was an error trying to insert into the TVEpisodeQueue table by the given IMDBID.", ex, imdbid);
+                    Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
                 }
             } while (!success);
             Program._eh.ResetConsecutvieErrorCount();
@@ -4066,9 +4079,12 @@ namespace MovieDatabaseWorker
                 }
                 success = true;
             }
-            catch
+            catch(Exception ex)
             {
                 success = false;
+                Program._eh.IncreaseConsecutvieErrorCount();
+                Log.Verbose("FTPUploadFile - There was an error trying to uplodad a file to the FTP server.", ex);
+                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
             }
 
             return success;
@@ -4100,9 +4116,12 @@ namespace MovieDatabaseWorker
 
                 success = true;
             }
-            catch
+            catch(Exception ex)
             {
                 success = false;
+                Program._eh.IncreaseConsecutvieErrorCount();
+                Log.Verbose("FTPDownloadFile - There was an error trying to downlaod a file from the FTP server.", ex);
+                Log.Error("Consecutive error cound = {ConsecutiveErrorCount}", Program._eh.ConsecutiveErrorCount);
             }
 
             return success;
